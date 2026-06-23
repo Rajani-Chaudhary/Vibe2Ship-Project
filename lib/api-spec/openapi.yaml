@@ -1,22 +1,22 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Last-Minute Life Saver API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: ai
+    description: AI operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +24,102 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /ai/analyze-risk:
+    post:
+      operationId: analyzeRisk
+      tags: [ai]
+      summary: Analyze deadline risk for a task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiskAnalysisInput"
+      responses:
+        "200":
+          description: Risk analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskAnalysis"
+
+  /ai/breakdown:
+    post:
+      operationId: generateBreakdown
+      tags: [ai]
+      summary: Generate task breakdown into subtasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BreakdownInput"
+      responses:
+        "200":
+          description: Task breakdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskBreakdown"
+
+  /ai/rescue-plan:
+    post:
+      operationId: generateRescuePlan
+      tags: [ai]
+      summary: Generate hour-by-hour rescue plan for a critical task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RescuePlanInput"
+      responses:
+        "200":
+          description: Rescue plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RescuePlan"
+
+  /ai/prioritize:
+    post:
+      operationId: prioritizeTasks
+      tags: [ai]
+      summary: Prioritize a list of tasks using AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrioritizeInput"
+      responses:
+        "200":
+          description: Prioritized tasks
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrioritizedTasks"
+
+  /ai/chat:
+    post:
+      operationId: aiChat
+      tags: [ai]
+      summary: Chat with the AI productivity assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatInput"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +130,225 @@ components:
       required:
         - status
 
+    RiskAnalysisInput:
+      type: object
+      required:
+        - title
+        - deadline
+        - estimatedHours
+        - priority
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        deadline:
+          type: string
+        estimatedHours:
+          type: number
+        priority:
+          type: string
+        existingTaskCount:
+          type: ["integer", "null"]
+
+    RiskAnalysis:
+      type: object
+      required:
+        - riskLevel
+        - riskScore
+        - reason
+        - suggestedAction
+      properties:
+        riskLevel:
+          type: string
+          enum: [low, medium, high, critical]
+        riskScore:
+          type: integer
+        reason:
+          type: string
+        suggestedAction:
+          type: string
+
+    BreakdownInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        estimatedHours:
+          type: ["number", "null"]
+
+    SubTask:
+      type: object
+      required:
+        - title
+        - estimatedMinutes
+        - order
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        estimatedMinutes:
+          type: integer
+        order:
+          type: integer
+
+    TaskBreakdown:
+      type: object
+      required:
+        - subtasks
+        - totalEstimatedMinutes
+      properties:
+        subtasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubTask"
+        totalEstimatedMinutes:
+          type: integer
+        tips:
+          type: ["string", "null"]
+
+    RescuePlanInput:
+      type: object
+      required:
+        - title
+        - deadline
+        - estimatedHours
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        deadline:
+          type: string
+        estimatedHours:
+          type: number
+
+    RescueSession:
+      type: object
+      required:
+        - time
+        - activity
+        - durationMinutes
+      properties:
+        time:
+          type: string
+        activity:
+          type: string
+        durationMinutes:
+          type: integer
+        notes:
+          type: ["string", "null"]
+
+    RescuePlan:
+      type: object
+      required:
+        - sessions
+        - estimatedCompletionTime
+        - urgencyMessage
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RescueSession"
+        estimatedCompletionTime:
+          type: string
+        urgencyMessage:
+          type: string
+        focusTips:
+          type: ["string", "null"]
+
+    TaskSummary:
+      type: object
+      required:
+        - title
+        - deadline
+        - priority
+        - estimatedHours
+      properties:
+        title:
+          type: string
+        deadline:
+          type: string
+        priority:
+          type: string
+        estimatedHours:
+          type: number
+        status:
+          type: ["string", "null"]
+
+    PrioritizeInput:
+      type: object
+      required:
+        - tasks
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskSummary"
+
+    PrioritizedTask:
+      type: object
+      required:
+        - title
+        - rank
+        - reasoning
+        - urgency
+      properties:
+        title:
+          type: string
+        rank:
+          type: integer
+        reasoning:
+          type: string
+        urgency:
+          type: string
+
+    PrioritizedTasks:
+      type: object
+      required:
+        - tasks
+        - overallStrategy
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/PrioritizedTask"
+        overallStrategy:
+          type: string
+
+    ChatMessage:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+
+    ChatInput:
+      type: object
+      required:
+        - messages
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        taskContext:
+          type: ["string", "null"]
+
+    ChatResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

@@ -5,7 +5,8 @@
  * Last-Minute Life Saver API
  * OpenAPI spec version: 0.1.0
  */
+import type { TaskSummary } from './taskSummary';
 
-export interface HealthStatus {
-  status: string;
+export interface PrioritizeInput {
+  tasks: TaskSummary[];
 }
