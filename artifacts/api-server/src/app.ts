@@ -3,9 +3,11 @@ import cors from "cors";
 // import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+// import pinoHttp from "pino-http";
+import { pinoHttp } from "pino-http";
 
 const app: Express = express();
-import pinoHttp from "pino-http";
+
 
 app.use(
   pinoHttp({
