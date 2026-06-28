@@ -18,13 +18,18 @@ const router: IRouter = Router();
 
 function getGeminiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
+  // if (!apiKey) {
+  //   throw new Error("GEMINI_API_KEY environment variable is not set");
+  // }
+  // 
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable is not set");
+    logger.error("GEMINI_API_KEY is missing in backend env");
+    throw new Error("Missing GEMINI_API_KEY");
   }
+  const genAI = new GoogleGenerativeAI(apiKey);
   return new GoogleGenerativeAI(apiKey);
 }
-
-const MODEL = "gemini-2.5-flash-lite";
+const MODEL = "gemini-2.5-pro";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function generateJSON<T>(prompt: string, retries = 3): Promise<T> {
